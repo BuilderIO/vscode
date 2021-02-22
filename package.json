@@ -2,6 +2,7 @@
   "name": "@builder.io/vscode",
   "description": "Builder.io integration for VSCode - turn designs into code!",
   "version": "0.0.1",
+  "publisher": "builder",
   "engines": {
     "vscode": "^1.47.0"
   },
@@ -9,6 +10,10 @@
     "Visualization",
     "Snippets"
   ],
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "207593"
+  },
   "activationEvents": [
     "onCommand:builder.start",
     "onCommand:builder.doRefactor",
@@ -16,7 +21,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/microsoft/vscode-extension-samples.git"
+    "url": "https://github.com/BuilderIO/vscode.git"
   },
   "main": "./out/extension.js",
   "contributes": {
