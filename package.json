@@ -1,0 +1,51 @@
+{
+  "name": "@builder.io/vscode",
+  "description": "Builder.io integration for VSCode - turn designs into code!",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.47.0"
+  },
+  "categories": [
+    "Visualization",
+    "Snippets"
+  ],
+  "activationEvents": [
+    "onCommand:builder.start",
+    "onCommand:builder.doRefactor",
+    "onWebviewPanel:builder"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/microsoft/vscode-extension-samples.git"
+  },
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "builder.start",
+        "title": "Open Builder.io",
+        "category": "Builder.io"
+      },
+      {
+        "command": "builder.doRefactor",
+        "title": "Do some refactoring",
+        "category": "Builder.io"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "lint": "eslint . --ext .ts,.tsx",
+    "watch": "tsc -w -p ./"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^3.0.2",
+    "@typescript-eslint/parser": "^3.0.2",
+    "eslint": "^7.1.0",
+    "typescript": "^4.0.2",
+    "@types/vscode": "^1.47.0",
+    "@types/node": "^12.12.0"
+  }
+}
