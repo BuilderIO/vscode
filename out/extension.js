@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = void 0;
 const vscode = require("vscode");
-const useDev = false; // process.env.NODE_ENV === "development";
+const useDev = true; // process.env.NODE_ENV === "development";
 function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand("builder.start", () => {
         BuilderPanel.createOrShow(context.extensionUri);

@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-const useDev = false; // process.env.NODE_ENV === "development";
+const useDev = true; // process.env.NODE_ENV === "development";
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(

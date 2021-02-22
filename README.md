@@ -3,6 +3,7 @@
 Integrates Builder.io into your IDE for turning designs into code and more.
 
 <img src="https://cdn.builder.io/api/v1/image/assets%2FYJIGb4i01jvw0SRdL5Bt%2Fb047e4f59048449a980697c9a12eaf3f" alt="Screenshot of Builder.io in VSCode" />
+<img src="https://cdn.builder.io/api/v1/image/assets%2FYJIGb4i01jvw0SRdL5Bt%2F1d59909e2a214c79ad2b1e8ad3fb8245" alt="Screenshot of grabbing code from Builder.io in VSCode" />
 
 ## How to use
 
