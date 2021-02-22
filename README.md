@@ -7,7 +7,7 @@ Turn designs into code right inside your IDE!
 
 ## How to use
 
-Open your command palette, search "Builder.io", and hit enter to launch the Builder.io fiddle to create and import designs and grab clean generated code.
+Open your command palette, search "Builder.io", and hit enter to launch the Builder.io fiddle to create and import designs and grab clean generated code via [JSX Lite](https://github.com/builderio/jsx-lite)
 
 <img alt="Screenshot of entering Builder.io from comand palette" src="https://cdn.builder.io/api/v1/image/assets%2FYJIGb4i01jvw0SRdL5Bt%2F9f950bd9d3c74570b1c84edf39a5f976" />
 
