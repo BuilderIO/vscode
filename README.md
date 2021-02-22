@@ -1,12 +1,20 @@
-# Builder.io VSCode Plugin
+# Builder.io for VSCode - designs to code!
 
-Integrates Builder.io into your IDE for turning designs into code and more!
+Integrates Builder.io into your IDE for turning designs into code and more.
 
-<!-- TODO: gif or image -->
+<img src="https://cdn.builder.io/api/v1/image/assets%2FYJIGb4i01jvw0SRdL5Bt%2Fb047e4f59048449a980697c9a12eaf3f" alt="Screenshot of Builder.io in VSCode" />
+
+## How to use
+
+Open your command palette, search "Builder.io", and hit enter to launch the Builder.io fiddle to create and import designs and grab clean generated code.
+
+<img alt="Screenshot of entering Builder.io from comand palette" src="https://cdn.builder.io/api/v1/image/assets%2FYJIGb4i01jvw0SRdL5Bt%2F9f950bd9d3c74570b1c84edf39a5f976" />
 
 ## Features
 
-- Convert Figma and Builder designs to React, Vue, Angular, HTML, etc code via [JSX Lite](https://github.com/builderio/jsx-lite)
+- Convert Figma and Builder designs to React, Vue, Angular, HTML, etc code via [JSX Lite](https://github.com/builderio/jsx-lite).
+
+Visual development right in your IDE!
 
 ## Roadmap
 

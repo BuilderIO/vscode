@@ -1,25 +1,21 @@
 import * as vscode from "vscode";
 
-const cats = {
-  "Coding Cat": "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif",
-  "Compiling Cat": "https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif",
-  "Testing Cat": "https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif",
-};
+const useDev = false; // process.env.NODE_ENV === "development";
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
-    vscode.commands.registerCommand("catCoding.start", () => {
+    vscode.commands.registerCommand("builder.start", () => {
       BuilderPanel.createOrShow(context.extensionUri);
     })
   );
 
-  context.subscriptions.push(
-    vscode.commands.registerCommand("catCoding.doRefactor", () => {
-      if (BuilderPanel.currentPanel) {
-        BuilderPanel.currentPanel.doRefactor();
-      }
-    })
-  );
+  // context.subscriptions.push(
+  //   vscode.commands.registerCommand("builder.doRefactor", () => {
+  //     if (BuilderPanel.currentPanel) {
+  //       BuilderPanel.currentPanel.doRefactor();
+  //     }
+  //   })
+  // );
 
   if (vscode.window.registerWebviewPanelSerializer) {
     // Make sure we register a serializer in activation event
@@ -138,29 +134,14 @@ class BuilderPanel {
   private _update() {
     const webview = this._panel.webview;
 
-    // Vary the webview's content based on where it is located in the editor.
-    switch (this._panel.viewColumn) {
-      case vscode.ViewColumn.Two:
-        this._updateForCat(webview, "Compiling Cat");
-        return;
-
-      case vscode.ViewColumn.Three:
-        this._updateForCat(webview, "Testing Cat");
-        return;
-
-      case vscode.ViewColumn.One:
-      default:
-        this._updateForCat(webview, "Coding Cat");
-        return;
-    }
+    this._updateWebview(webview);
   }
 
-  private _updateForCat(webview: vscode.Webview, catName: keyof typeof cats) {
-    this._panel.title = catName;
-    this._panel.webview.html = this._getHtmlForWebview(webview, cats[catName]);
+  private _updateWebview(webview: vscode.Webview) {
+    this._panel.webview.html = this._getHtmlForWebview(webview);
   }
 
-  private _getHtmlForWebview(webview: vscode.Webview, catGifPath: string) {
+  private _getHtmlForWebview(webview: vscode.Webview) {
     // Local path to main script run in the webview
     const scriptPathOnDisk = vscode.Uri.joinPath(
       this._extensionUri,
@@ -199,7 +180,11 @@ class BuilderPanel {
 					Use a content security policy to only allow loading images from https or from our extension directory,
 					and only allow scripts that have a specific nonce.
 				-->
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; img-src ${webview.cspSource} https:; script-src 'nonce-${nonce}';">
+				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; frame-src ${
+          useDev ? "*" : "https://*"
+        }; style-src ${webview.cspSource}; img-src ${
+      webview.cspSource
+    } https:; script-src 'nonce-${nonce}';">
 
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -209,8 +194,9 @@ class BuilderPanel {
 				<title>Builder.io</title>
 			</head>
 			<body>
-				<img src="${catGifPath}" width="300" />
-				<h1 id="lines-of-code-counter">0</h1>
+				<iframe class="fiddle-frame" src="${
+          useDev ? "http://localhost:1234" : "https://builder.io"
+        }/fiddle"></iframe>
 
 				<script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
