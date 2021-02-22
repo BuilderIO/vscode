@@ -1,4 +1,4 @@
-# Builder.io for VSCode - designs to code!
+# Builder.io for VSCode
 
 Turn designs into code right inside your IDE!
 
