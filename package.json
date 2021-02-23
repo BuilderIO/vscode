@@ -1,5 +1,5 @@
 {
-  "name": "@builder.io/vscode",
+  "name": "Builder",
   "description": "Builder.io integration for VSCode - turn designs into code!",
   "version": "0.0.1",
   "publisher": "builder",
