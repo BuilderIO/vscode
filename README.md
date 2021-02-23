@@ -1,6 +1,6 @@
 # Builder.io for VSCode
 
-Turn designs into code right inside your IDE!
+Turn designs into code right inside your IDE! Powered by [Builder.io](https://github.com/builderio/builder) and [JSX Lite](https://github.com/builderio/jsx-lite)
 
 Install the extension [here](https://marketplace.visualstudio.com/items?itemName=builder.Builder)
 
@@ -8,6 +8,8 @@ Install the extension [here](https://marketplace.visualstudio.com/items?itemName
 <img src="https://cdn.builder.io/api/v1/image/assets%2FYJIGb4i01jvw0SRdL5Bt%2F1d59909e2a214c79ad2b1e8ad3fb8245" alt="Screenshot of grabbing code from Builder.io in VSCode" />
 
 ## How to use
+
+Install the extension [here](https://marketplace.visualstudio.com/items?itemName=builder.Builder)
 
 Open your command palette, search "Builder.io", and hit enter to launch the Builder.io fiddle to create and import designs and grab clean generated code via [JSX Lite](https://github.com/builderio/jsx-lite)
 
