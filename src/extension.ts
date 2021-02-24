@@ -1,6 +1,7 @@
+import { componentToBuilder, parseJsx } from "@jsx-lite/core";
 import * as vscode from "vscode";
-
-const useDev = false;
+import { BuilderJSXLiteEditorProvider } from "./builder-jsx-lite-editor";
+import { useDev } from "./config";
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
@@ -9,13 +10,28 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
-  // context.subscriptions.push(
-  //   vscode.commands.registerCommand("builder.doRefactor", () => {
-  //     if (BuilderPanel.currentPanel) {
-  //       BuilderPanel.currentPanel.doRefactor();
-  //     }
-  //   })
-  // );
+  function openPreviewToTheSide(uri?: vscode.Uri) {
+    let resource = uri;
+    if (!(resource instanceof vscode.Uri)) {
+      if (vscode.window.activeTextEditor) {
+        // we are relaxed and don't check for markdown files
+        resource = vscode.window.activeTextEditor.document.uri;
+      }
+    }
+    BuilderPanel.openEditor(resource!, vscode.window.activeTextEditor!, {
+      viewColumn: vscode.ViewColumn.Two,
+      preserveFocus: true,
+    });
+  }
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "builder.openJsxLiteEditorToTheSide",
+      openPreviewToTheSide
+    )
+  );
+
+  context.subscriptions.push(BuilderJSXLiteEditorProvider.register(context));
 
   if (vscode.window.registerWebviewPanelSerializer) {
     // Make sure we register a serializer in activation event
@@ -42,6 +58,28 @@ class BuilderPanel {
   private readonly _panel: vscode.WebviewPanel;
   private readonly _extensionUri: vscode.Uri;
   private _disposables: vscode.Disposable[] = [];
+
+  public static openEditor(
+    sourceUri: vscode.Uri,
+    editor: vscode.TextEditor,
+    viewOptions: { viewColumn: vscode.ViewColumn; preserveFocus?: boolean }
+  ) {
+    // Otherwise, create a new panel.
+    const panel = vscode.window.createWebviewPanel(
+      BuilderPanel.viewType,
+      "Builder.io",
+      viewOptions,
+      {
+        // Enable javascript in the webview
+        enableScripts: true,
+
+        // And restrict the webview to only loading content from our extension's `media` directory.
+        localResourceRoots: [vscode.Uri.joinPath(sourceUri, "media")],
+      }
+    );
+
+    BuilderPanel.currentPanel = new BuilderPanel(panel, sourceUri, editor);
+  }
 
   public static createOrShow(extensionUri: vscode.Uri) {
     const column = vscode.window.activeTextEditor
@@ -75,7 +113,11 @@ class BuilderPanel {
     BuilderPanel.currentPanel = new BuilderPanel(panel, extensionUri);
   }
 
-  private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
+  private constructor(
+    panel: vscode.WebviewPanel,
+    extensionUri: vscode.Uri,
+    private editor?: vscode.TextEditor
+  ) {
     this._panel = panel;
     this._extensionUri = extensionUri;
 
@@ -100,15 +142,53 @@ class BuilderPanel {
     // Handle messages from the webview
     this._panel.webview.onDidReceiveMessage(
       (message) => {
-        switch (message.command) {
-          case "alert":
-            vscode.window.showErrorMessage(message.text);
+        console.log("message", message);
+        switch (message.type) {
+          case "builder.editorLoaded":
+            // Get current text and post down
+            return;
+          case "builder.editorDataUpdated":
+            // Update the code
             return;
         }
       },
       null,
       this._disposables
     );
+
+    if (this.editor) {
+      this._disposables.push(
+        vscode.workspace.onDidChangeTextDocument((event) => {
+          const text = event.document.getText();
+
+          const parsed = parseJsx(text);
+          const builderContent = componentToBuilder(parsed);
+
+          this._panel.webview.postMessage({
+            type: "builder.textChanged",
+            data: {
+              builderJson: builderContent,
+            },
+          });
+          console.log("change", event);
+        })
+      );
+      this._disposables.push(
+        vscode.workspace.onDidSaveTextDocument((event) => {
+          console.log("save", event);
+        })
+      );
+      this._disposables.push(
+        vscode.window.onDidChangeTextEditorSelection((event) => {
+          console.log("selection", event);
+        })
+      );
+      this._disposables.push(
+        vscode.window.onDidChangeActiveTextEditor((event) => {
+          console.log("activeEditorChange", event);
+        })
+      );
+    }
   }
 
   public doRefactor() {
@@ -171,6 +251,8 @@ class BuilderPanel {
     // Use a nonce to only allow specific scripts to be run
     const nonce = getNonce();
 
+    console.log("is this one?");
+
     return `<!DOCTYPE html>
 			<html lang="en">
 			<head>
@@ -182,7 +264,7 @@ class BuilderPanel {
 				-->
 				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; frame-src ${
           useDev ? "*" : "https://*"
-        }; style-src ${webview.cspSource}; img-src ${
+        }; style-src https://* ${webview.cspSource} 'nonce-${nonce}'; img-src ${
       webview.cspSource
     } https:; script-src 'nonce-${nonce}';">
 
@@ -194,13 +276,65 @@ class BuilderPanel {
 				<title>Builder.io</title>
 			</head>
 			<body>
+        <style nonce="${nonce}"> 
+          .fiddle-frame {
+            border: none;
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            right: -10%;
+            bottom: -10%;	
+            width: 120%;
+            height: 120%;
+            transform: scale(0.8333);
+          }
+        </style>
 				<iframe class="fiddle-frame" src="${
           useDev ? "http://localhost:1234" : "https://builder.io"
         }/fiddle"></iframe>
 
-				<script nonce="${nonce}" src="${scriptUri}"></script>
+				<script nonce="${nonce}">
+          /* eslint-disable no-undef */
+          
+          // This script will be run within the webview itself
+          // It cannot access the main VS Code APIs directly.
+          (function () {
+            /** @type {HTMLIFrameElement} */
+            const frame = document.querySelector(".fiddle-frame");
+              
+            window.addEventListener("message", (e) => {
+              const data = e.data;
+          
+              console.log("message", data, e);
+          
+              if (data) {
+                if (data.type === "builder.textChanged") {
+                  frame.contentWindow.postMessage({
+                    type: "builder.updateEditorData",
+                    data: { data: data.data.builderJson },
+                  });
+                }
+
+                if (data.type === "builder.editorLoaded") {
+                  // Loaded - message down the data
+                  vscode.postMessage({
+                    type: "builder.editorLoaded",
+                  });
+                }
+          
+                if (data.type === "builder.editorDataUpdated") {
+                  // Loaded - data updated
+                  vscode.postMessage({
+                    type: "builder.editorDataUpdated",
+                    data: data.data,
+                  });
+                }
+              }
+            });
+          })();
+        </script>
 			</body>
-			</html>`;
+		</html>`;
   }
 }
 

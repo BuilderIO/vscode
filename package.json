@@ -17,7 +17,8 @@
   "activationEvents": [
     "onCommand:builder.start",
     "onCommand:builder.doRefactor",
-    "onWebviewPanel:builder"
+    "onWebviewPanel:builder",
+    "onCommand:builder.openJsxLiteEditorToTheSide"
   ],
   "repository": {
     "type": "git",
@@ -27,9 +28,31 @@
   "contributes": {
     "commands": [
       {
+        "command": "builder.openJsxLiteEditorToTheSide",
+        "title": "Open Builder.io visual editor to the side",
+        "category": "Builder.io"
+      },
+      {
+        "command": "builder.openJsxLiteEditor",
+        "title": "Open Builder.io visual editor",
+        "category": "Builder.io"
+      },
+      {
         "command": "builder.start",
         "title": "Open Builder.io",
         "category": "Builder.io"
+      }
+    ],
+    "customEditors": [
+      {
+        "viewType": "builder.jsxLiteEditor",
+        "displayName": "Builder.io Visual Editor",
+        "selector": [
+          {
+            "filenamePattern": "*.lite.*"
+          }
+        ],
+        "priority": "option"
       }
     ]
   },
@@ -39,7 +62,9 @@
     "lint": "eslint . --ext .ts,.tsx",
     "watch": "tsc -w -p ./"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@jsx-lite/core": "0.0.6"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^3.0.2",
     "@typescript-eslint/parser": "^3.0.2",
