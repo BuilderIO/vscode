@@ -1,7 +1,12 @@
-import { componentToBuilder, parseJsx } from "@jsx-lite/core";
+import {
+  builderContentToJsxLiteComponent,
+  componentToBuilder,
+  componentToJsxLite,
+  parseJsx,
+} from "@jsx-lite/core";
 import * as vscode from "vscode";
 import { BuilderJSXLiteEditorProvider } from "./builder-jsx-lite-editor";
-import { useDev } from "./config";
+import { useBeta, useDev } from "./config";
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
@@ -40,7 +45,6 @@ export function activate(context: vscode.ExtensionContext) {
         webviewPanel: vscode.WebviewPanel,
         state: any
       ) {
-        console.log(`Got state: ${state}`);
         BuilderPanel.revive(webviewPanel, context.extensionUri);
       },
     });
@@ -142,14 +146,45 @@ class BuilderPanel {
     // Handle messages from the webview
     this._panel.webview.onDidReceiveMessage(
       (message) => {
-        console.log("message", message);
         switch (message.type) {
-          case "builder.editorLoaded":
+          case "builder.editorLoaded": {
+            const text = this.editor!.document.getText();
+
+            const parsed = parseJsx(text);
+            const builderContent = componentToBuilder(parsed);
+
+            this._panel.webview.postMessage({
+              type: "builder.textChanged",
+              data: {
+                builderJson: builderContent,
+              },
+            });
             // Get current text and post down
             return;
-          case "builder.editorDataUpdated":
-            // Update the code
+          }
+
+          case "builder.saveContent": {
+            const content = message.data.content;
+            if (typeof content?.data?.blocksString === "string") {
+              content.data.blocks = JSON.parse(content.data.blocksString);
+              delete content.data.blocksString;
+            }
+
+            const jsxLiteJson = builderContentToJsxLiteComponent(content);
+            const jsxLite = componentToJsxLite(jsxLiteJson);
+
+            const edit = new vscode.WorkspaceEdit();
+            const document = this.editor!.document;
+            edit.replace(
+              document.uri,
+              new vscode.Range(0, 0, document.lineCount, 0),
+              jsxLite
+            );
+
+            vscode.workspace.applyEdit(edit);
+            document.save();
             return;
+          }
         }
       },
       null,
@@ -159,7 +194,20 @@ class BuilderPanel {
     if (this.editor) {
       this._disposables.push(
         vscode.workspace.onDidChangeTextDocument((event) => {
-          const text = event.document.getText();
+          // const text = event.document.getText();
+          // const parsed = parseJsx(text);
+          // const builderContent = componentToBuilder(parsed);
+          // this._panel.webview.postMessage({
+          //   type: "builder.textChanged",
+          //   data: {
+          //     builderJson: builderContent,
+          //   },
+          // });
+        })
+      );
+      this._disposables.push(
+        vscode.workspace.onDidSaveTextDocument((document) => {
+          const text = document.getText();
 
           const parsed = parseJsx(text);
           const builderContent = componentToBuilder(parsed);
@@ -170,22 +218,18 @@ class BuilderPanel {
               builderJson: builderContent,
             },
           });
-          console.log("change", event);
-        })
-      );
-      this._disposables.push(
-        vscode.workspace.onDidSaveTextDocument((event) => {
-          console.log("save", event);
+          console.info("save");
         })
       );
       this._disposables.push(
         vscode.window.onDidChangeTextEditorSelection((event) => {
-          console.log("selection", event);
+          // TODO: sync text cursor/selection with builder scroll/selection
+          console.info("selection change", event);
         })
       );
       this._disposables.push(
         vscode.window.onDidChangeActiveTextEditor((event) => {
-          console.log("activeEditorChange", event);
+          console.info("active editor change", event);
         })
       );
     }
@@ -251,8 +295,6 @@ class BuilderPanel {
     // Use a nonce to only allow specific scripts to be run
     const nonce = getNonce();
 
-    console.log("is this one?");
-
     return `<!DOCTYPE html>
 			<html lang="en">
 			<head>
@@ -290,11 +332,16 @@ class BuilderPanel {
           }
         </style>
 				<iframe class="fiddle-frame" src="${
-          useDev ? "http://localhost:1234" : "https://builder.io"
+          useDev
+            ? "http://localhost:1234"
+            : useBeta
+            ? "https://beta.builder.io"
+            : "https://builder.io"
         }/fiddle"></iframe>
 
 				<script nonce="${nonce}">
           /* eslint-disable no-undef */
+          const vscode = acquireVsCodeApi();
           
           // This script will be run within the webview itself
           // It cannot access the main VS Code APIs directly.
@@ -305,28 +352,26 @@ class BuilderPanel {
             window.addEventListener("message", (e) => {
               const data = e.data;
           
-              console.log("message", data, e);
-          
               if (data) {
                 if (data.type === "builder.textChanged") {
                   frame.contentWindow.postMessage({
                     type: "builder.updateEditorData",
-                    data: { data: data.data.builderJson },
-                  });
+                    data: { data: data.data.builderJson }
+                  }, '*');
                 }
 
                 if (data.type === "builder.editorLoaded") {
                   // Loaded - message down the data
                   vscode.postMessage({
-                    type: "builder.editorLoaded",
+                    type: "builder.editorLoaded"
                   });
                 }
           
-                if (data.type === "builder.editorDataUpdated") {
+                if (data.type === "builder.saveContent") {
                   // Loaded - data updated
                   vscode.postMessage({
-                    type: "builder.editorDataUpdated",
-                    data: data.data,
+                    type: "builder.saveContent",
+                    data: data.data
                   });
                 }
               }
