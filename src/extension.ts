@@ -132,17 +132,6 @@ class BuilderPanel {
     // This happens when the user closes the panel or when the panel is closed programatically
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
-    // Update the content based on view changes
-    this._panel.onDidChangeViewState(
-      (e) => {
-        if (this._panel.visible) {
-          this._update();
-        }
-      },
-      null,
-      this._disposables
-    );
-
     // Handle messages from the webview
     this._panel.webview.onDidReceiveMessage(
       (message) => {
@@ -159,7 +148,12 @@ class BuilderPanel {
                 builderJson: builderContent,
               },
             });
-            // Get current text and post down
+            return;
+          }
+          case "builder.openWindow": {
+            const url = message.data.url;
+
+            vscode.env.openExternal(vscode.Uri.parse(url));
             return;
           }
 
@@ -295,6 +289,8 @@ class BuilderPanel {
     // Use a nonce to only allow specific scripts to be run
     const nonce = getNonce();
 
+    console.log("BOOTING");
+
     return `<!DOCTYPE html>
 			<html lang="en">
 			<head>
@@ -365,6 +361,11 @@ class BuilderPanel {
                   vscode.postMessage({
                     type: "builder.editorLoaded"
                   });
+                }
+
+                if (data.type === "builder.openWindow") {
+                  // Loaded - message down the data
+                  vscode.postMessage(data);
                 }
           
                 if (data.type === "builder.saveContent") {
