@@ -1,7 +1,7 @@
 {
   "name": "Builder",
   "description": "Builder.io integration for VSCode - turn designs into code!",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "publisher": "builder",
   "engines": {
     "vscode": "^1.47.0"
