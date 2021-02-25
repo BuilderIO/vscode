@@ -63,7 +63,7 @@
     "watch": "tsc -w -p ./"
   },
   "dependencies": {
-    "@jsx-lite/core": "0.0.7"
+    "@jsx-lite/core": "0.0.9"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^3.0.2",

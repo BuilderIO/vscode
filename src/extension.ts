@@ -289,8 +289,6 @@ class BuilderPanel {
     // Use a nonce to only allow specific scripts to be run
     const nonce = getNonce();
 
-    console.log("BOOTING");
-
     return `<!DOCTYPE html>
 			<html lang="en">
 			<head>
