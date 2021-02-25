@@ -1,8 +1,17 @@
-# Builder.io for VSCode
+<h1 align="center"> Builder.io for VSCode </h1>
 
-Turn designs into code right inside your IDE! Powered by [Builder.io](https://github.com/builderio/builder) and [JSX Lite](https://github.com/builderio/jsx-lite)
+<h3 align="center">Visual coding in your IDE!</h3>
+<br />
+<p align="center">
+  <img alt="Visual coding demo" src="https://i.imgur.com/UlWMkRx.gif" />
+</p>
 
-Install the extension [here](https://marketplace.visualstudio.com/items?itemName=builder.Builder)
+## What can yo do?
+
+1. Import designs from Builder.io and Figma and convert them to code of your framework of choice (React, Vue, Svelte, Solid, Angular, and more)
+2. Visually create and edit JSX Lite code
+
+Powered by [Builder.io](https://github.com/builderio/builder) and [JSX Lite](https://github.com/builderio/jsx-lite)
 
 <img src="https://cdn.builder.io/api/v1/image/assets%2FYJIGb4i01jvw0SRdL5Bt%2Fb047e4f59048449a980697c9a12eaf3f" alt="Screenshot of Builder.io in VSCode" />
 <img src="https://cdn.builder.io/api/v1/image/assets%2FYJIGb4i01jvw0SRdL5Bt%2F1d59909e2a214c79ad2b1e8ad3fb8245" alt="Screenshot of grabbing code from Builder.io in VSCode" />
