@@ -10,6 +10,8 @@
   <img alt="Visual coding demo" src="https://i.imgur.com/UlWMkRx.gif" />
 </p>
 
+<br />
+
 ## What can yo do?
 
 1. Import designs from Builder.io and Figma and convert them to code of your framework of choice (React, Vue, Svelte, Solid, Angular, and more)
