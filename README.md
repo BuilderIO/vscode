@@ -1,6 +1,10 @@
+<p align="center">
+  <img height="150 alt="Builder + VS Code logos" src="https://cdn.builder.io/api/v1/image/assets%2FYJIGb4i01jvw0SRdL5Bt%2F2cf38c7c33264b5599ef608d2b721421" />
+</p>
+
 <h1 align="center"> Builder.io for VSCode </h1>
 
-<h3 align="center">Visual coding in your IDE!</h3>
+<h4 align="center">Visual coding in your IDE!</h4>
 <br />
 <p align="center">
   <img alt="Visual coding demo" src="https://i.imgur.com/UlWMkRx.gif" />
