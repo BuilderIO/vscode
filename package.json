@@ -33,11 +33,6 @@
         "category": "Builder.io"
       },
       {
-        "command": "builder.openJsxLiteEditor",
-        "title": "Open Builder.io visual editor",
-        "category": "Builder.io"
-      },
-      {
         "command": "builder.start",
         "title": "Open Builder.io",
         "category": "Builder.io"
